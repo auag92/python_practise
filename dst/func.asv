@@ -1,0 +1,7 @@
+function[d3,d4]=func(d1,d2)
+d3=10;
+d4=10;
+abc(2)=d3;
+abc(4)=d4;
+
+

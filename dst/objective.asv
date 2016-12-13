@@ -1,0 +1,40 @@
+function[K,V,Q,T,Dfront,OP]=objective(K,V,Q,T,Dfront,OP)
+
+if Q(K,2)==9999 
+    V=not(V);
+    obj=[K V];
+else
+    %select gate from Dfront
+    if size(Dfront,1)==1
+        G=Dfront(1);
+    else
+        G=randsample(Dfront,1);
+    end
+    h=find(OP(:,:)==G);
+    
+    % choose one input of gate from the D frontier
+    if strcmp(T(h,1),'INV')||strcmp(T(h,1),'BUF')%%THIS CASE NEVER COMES
+        if (Q(T{h,2},2)==9999) || (Q(T{K,4},2)==666) %check if value is undefined
+            J=T{h,2};
+            C=V;
+        end
+    else strcmp(T(h,1),'OR')||strcmp(T(h,1),'AND')||strcmp(T(h,1),'NOR')||strcmp(T(h,1),'NAND')
+        if (Q(T(h,2),2)==9999) || (Q(T{K,4,2)==666)
+            J=T{h,2};
+        else %Q(T{h,3},2)==9999
+            J=T{h,3};
+        end
+        % set controlling values of gates
+        if strcmp(T(h,1),'OR')||strcmp(T(h,1),'NOR')
+            C=1;
+        else
+            C=0;
+        end
+    end % choosing ends
+    obj(1,1)=J;
+    obj(1,2)=not(C);
+    K=obj(1,1); %setting [k,v] for backtrace
+    V=obj(1,2);
+end
+
+end

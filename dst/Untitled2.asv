@@ -1,0 +1,8 @@
+function result=f(x)
+if (x<=0)
+    result=1;
+else
+    result=x*f(x-1);
+end
+
+end

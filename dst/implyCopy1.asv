@@ -1,0 +1,82 @@
+%===============================================
+%SO FAR ONLY WORKING FOR ONE PATH!! (try to make array for J to track all paths)
+%(OR make a new 'undefined' and use prev algo)
+% while isempty(find(outputs(:,:)==J, 1))==1 %solve till J is a PO
+%     
+%     %get position of J in array b
+%     c=[];
+%     b=find([T{:,2}]==J);
+%     if strcmp([T{:,1}],'OR')||strcmp([T{:,1}],'AND')||strcmp([T{:,1}],'NOR')||strcmp([T{:,1}],'NAND')
+%         c=find([T{:,3}]==J);
+%     end
+%     for i=1:1:size(c,1)
+%         b(end+i)=c(i);
+%     end
+%     %get position of J END
+%     
+%     for h=1:1:size(b,1)
+%         if strcmp(T(b(h),1),'INV')
+%             J=T{b(h),3}; %assign J to output node
+%             for i=1:1:5
+%                 v=find(orderTables==V);
+%                 V=ttinv(v);
+%             end
+%                 
+%         elseif strcmp(T(b(h),1),'BUF')
+%             J=T{b(h),3}; %assign J to output node, V remains the same
+%             
+%         elseif strcmp(T(b(h),1),'AND')
+%             for i=1:1:5
+%                 v=find(orderTables==V);
+%                 if isempty(find(c)==J)==0
+%                     q=find(orderTables==Q(T{b(h),2},2));%node which isnt V
+%                 else
+%                     q=find(orderTables==Q(T{b(h),3},2));
+%                 end
+%                 V=ttand(v,q);
+%             end
+%             J=T{b(h),4}; %assign J to output node
+%             
+%         elseif strcmp(T(b(h),1),'OR')           
+%             for i=1:1:5
+%                 v=find(orderTables==V);
+%                 if isempty(find(c)==J)==0
+%                     q=find(orderTables==Q(T{b(h),2},2));%node which isnt V
+%                 else
+%                     q=find(orderTables==Q(T{b(h),3},2));
+%                 end
+%                 V=ttor(v,q);
+%             end
+%             J=T{b(h),4}; %assign J to output node
+%             
+%         elseif strcmp(T(b(h),1),'NAND')
+%             for i=1:1:5
+%                 v=find(orderTables==V);
+%                 if isempty(find(c)==J)==0
+%                     q=find(orderTables==Q(T{b(h),2},2));%node which isnt V
+%                 else
+%                     q=find(orderTables==Q(T{b(h),3},2));
+%                 end
+%                 V=ttNand(v,q);
+%             end
+%             J=T{b(h),4}; %assign J to output node
+%             
+%         else strcmp(T(b(h),1),'NOR')            
+%             for i=1:1:5
+%                 v=find(orderTables==V);
+%                 if isempty(find(c)==J)==0
+%                     q=find(orderTables==Q(T{b(h),2},2));%node which isnt V
+%                 else
+%                     q=find(orderTables==Q(T{b(h),3},2));
+%                 end
+%                 V=ttNor(v,q);
+%             end
+%             J=T{b(h),4}; %assign J to output node
+%             
+%         end
+%     end
+% end
+%===============================================
+
+
+objectiveCopy

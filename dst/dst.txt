@@ -1,0 +1,41 @@
+highest number for output: create matrix of that number (net matrix)
+
+netmatrix	driving gate	driven gates (linked list)	value(1st column??)
+1		input		a				0
+2		input		a				1
+3		input		b				0
+4		a		b,c				u
+5		b		output				u
+6		input		c				1
+7		c		output				u
+
+
+first take that gate whose inputs are completely defined (a in this case)
+
+1 set inputs for vector v
+2 set all nets to "u"
+3 find all gates whose inputs are completely defined and outputs are u
+4 evaluate these gates and set outputs to 0 or 1
+5 have all gates been evaluated??
+no - go to 3
+yes - stop
+
+
+a test vector detects a fault if and only if Zf(t) != Z(t) ie output at two diff circuits should be diff
+
+any gate is sensitized to f if output of gate = D or D'
+
+
+podem()
+{
+if(error at Do) set success;
+if(test not possible) return failure;
+(k,vk)=objective();
+(j,vj)=backtrace(k,vk);
+imply(j,vj);
+if(podem()=success,set success);
+imply(j,vj'); *reverse decision
+if podem()=success, set success;
+imply(j,x);
+set fail;
+}
