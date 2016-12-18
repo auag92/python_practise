@@ -1,0 +1,170 @@
+function[Q,T,Dfront,outputs,fault,inputs,status,flag] = imply(J,V,Q,T,Dfront,outputs,fault,inputs,flag)
+% global Q T Dfront inputs outputs OP fault;
+% T={};
+global orderTables ttor ttand ttinv ttNor ttNand ttbuf;
+
+Q(J,2)=V;%setting input from backtrace
+
+% if flag==2%make value D only if fault is activated
+%     if fault(1,2)==0
+%         Q(fault(1,1),2)=80;
+%         d=80;
+%     else
+%         Q(fault(1,1),2)=81;
+%         d=81;
+%     end
+% end
+
+Q1=Q;
+Dfront1=Dfront;
+% outputsA(:,1)=outputs(:,2);
+n1=1;
+% check = size(find(Q==666),1);
+check=1;
+% while check~=0
+for n1=1:1:12
+    Q2=Q;
+    for n=1:1:size(T,1)
+        if strcmp(T(n,1),'INV')==1 %&& Q(T{n,2},2)~=666
+            v=find(orderTables==Q(T{n,2},2));
+            Q(T{n,3},2)=ttinv(v);
+            if Q(fault(1,1),2)==not(fault(1,2));
+                if fault(1,2)==0
+                    Q(fault(1,1),2)=80;%D
+                else
+                    Q(fault(1,1),2)=81;%Dbar
+                end
+                flag=2;
+            end
+        end
+        % end
+        % for n=1:1:size(T,1)
+        if strcmp(T(n,1),'BUF')==1 %&& Q(T{n,2},2)~=666
+            v=find(orderTables==Q(T{n,2},2));
+            Q(T{n,3},2)=ttbuf(v);
+            if Q(fault(1,1),2)==not(fault(1,2));
+                if fault(1,2)==0
+                    Q(fault(1,1),2)=80;%D
+                else
+                    Q(fault(1,1),2)=81;%Dbar
+                end
+                flag=2;
+            end
+        end
+        % end
+        % for n=1:1:size(T,1)
+        if strcmp(T(n,1),'AND')==1 %&& Q(T{n,2},2)~=666 && Q(T{n,3},2)~=666
+            v=find(orderTables==Q(T{n,2},2));
+            q=find(orderTables==Q(T{n,3},2));
+            Q(T{n,4},2)=ttand(v,q);
+            if Q(fault(1,1),2)==not(fault(1,2));
+                if fault(1,2)==0
+                    Q(fault(1,1),2)=80;%D
+                else
+                    Q(fault(1,1),2)=81;%Dbar
+                end
+                flag=2;
+            end
+        end
+        %  end
+        %  for n=1:1:size(T,1)
+        if strcmp(T(n,1),'OR')==1 %&& Q(T{n,2},2)~=666 && Q(T{n,3},2)~=666
+            v=find(orderTables==Q(T{n,2},2));
+            q=find(orderTables==Q(T{n,3},2));
+            Q(T{n,4},2)=ttor(v,q);
+            if Q(fault(1,1),2)==not(fault(1,2));
+                if fault(1,2)==0
+                    Q(fault(1,1),2)=80;%D
+                else
+                    Q(fault(1,1),2)=81;%Dbar
+                end
+                flag=2;
+            end
+        end
+        % end
+        %  for n=1:1:size(T,1)
+        if strcmp(T(n,1),'NAND')==1 %&& Q(T{n,2},2)~=666 && Q(T{n,3},2)~=666
+            v=find(orderTables==Q(T{n,2},2));
+            q=find(orderTables==Q(T{n,3},2));
+            Q(T{n,4},2)=ttNand(v,q);
+            if Q(fault(1,1),2)==not(fault(1,2));
+                if fault(1,2)==0
+                    Q(fault(1,1),2)=80;%D
+                else
+                    Q(fault(1,1),2)=81;%Dbar
+                end
+                flag=2;
+            end
+        end
+        % end
+        % for n=1:1:size(T,1)
+        if strcmp(T(n,1),'NOR')==1 %&& Q(T{n,2},2)~=666 && Q(T{n,3},2)~=666
+            v=find(orderTables==Q(T{n,2},2));
+            q=find(orderTables==Q(T{n,3},2));
+            Q(T{n,4},2)=ttNor(v,q);
+            if Q(fault(1,1),2)==not(fault(1,2));
+                if fault(1,2)==0
+                    Q(fault(1,1),2)=80;%D
+                else
+                    Q(fault(1,1),2)=81;%Dbar
+                end
+                flag=2;
+            end
+        end
+    end
+%     if Q==Q2
+%         check=0;
+%     end
+%     check = size(find(Q==666),1);
+n1=n1+1;
+end
+
+%check for Dfrontier propagation
+Dfront=[];%empty Dfrontier because of recalculation so old values are not retained
+for o=1:1:size(Q,1)
+    if Q(o,2)==80||Q(o,2)==81
+        for o1=1:1:size(T,1)
+            if strcmp(T{o1,1},'AND')||strcmp(T{o1,1},'NAND')||strcmp(T{o1,1},'OR')||strcmp(T{o1,1},'NOR')
+                if T{o1,2}==Q(o,1)||T{o1,3}==Q(o,1)
+                    if Q(T{o1,4},2)==9999%output of the gate should be undefined
+                        if isempty(Dfront)==1
+                            Dfront(1)=T{o1,4};
+                        end
+                        if isempty(find(Dfront(:)==T{o1,4},1))==1%check if gate is not already in Dfrontier 
+                            Dfront(end+1)=T{o1,4};%add new gate to Dfrontier
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+outputs(:,2)=Q(outputs(:,1),2);
+inputs(:,2)=Q(inputs(:,1),2);
+% % % if flag==1 %in the case of checking for fault activation
+% % %     if Q(fault(1,1),2)~=fault(1,2)
+% % %         disp('fail');
+% % %         status = 'FAIL';
+% % % %         Q=Q1;%reset node values for failure
+% % % %         Dfront=Dfront1;
+% % % %         outputs(:,2)=outputsA(:,1);
+% % %     end
+% % % else%flag=2 in the case of checking empty Dfrontier
+% % %     if isempty(Dfront)==1
+% % %         if (isempty(find(outputs(:,2)==80,1))==0)||isempty(find(outputs(:,2)==81,1))==0
+% % %             disp('SUCCESS');%success if value has reached output
+% % %             status = 'SUCCESS';
+% % %         else
+% % %             disp('fail');
+% % %             status = 'FAIL';
+% % %             Q=Q1;%reset node values for failure
+% % %             Dfront=Dfront1;
+% % % %             outputs(:,2)=outputsA(:,1);
+% % %         end
+% % %     else
+% % %         status = 'FAIL';
+% % %     end
+% % % end
+status='pass';
+end

@@ -1,0 +1,99 @@
+function [status,inputs,outputs,Q]=podem1(Q,T,Dfront,outputs,inputs,J,J1,K,V,fault,OP,flag)
+
+global orderTables ttor ttand ttinv ttNor ttNand ttbuf;
+% global firstCase;
+%% truth tables
+orderTables=[0 1 80 81 9999];
+
+ttand(:,1)=[0 0 0 0 0];
+ttand(:,2)=[0 1 80 81 9999];
+ttand(:,3)=[0 80 80 0 9999];
+ttand(:,4)=[0 81 0 81 9999];
+ttand(:,5)=[0 9999 9999 9999 9999];
+
+ttor(:,1)=[0 1 80 81 9999];
+ttor(:,2)=[1 1 1 1 1];
+ttor(:,3)=[80 1 80 1 9999];
+ttor(:,4)=[81 1 1 81 9999];
+ttor(:,5)=[9999 1 9999 9999 9999];
+
+ttNand(:,1)=[1 1 1 1 1];
+ttNand(:,2)=[1 0 81 80 9999];
+ttNand(:,3)=[1 81 81 1 9999];
+ttNand(:,4)=[1 80 1 80 9999];
+ttNand(:,5)=[1 9999 9999 9999 9999];
+
+ttNor(:,1)=[1 0 81 80 9999];
+ttNor(:,2)=[0 0 0 0 0];
+ttNor(:,3)=[81 0 81 0 9999];
+ttNor(:,4)=[80 0 0 80 9999];
+ttNor(:,5)=[9999 0 9999 9999 9999];
+
+ttinv(:,1)=[1 0 81 80 9999];
+
+ttbuf(:,1)=[0 1 80 81 9999];
+
+K=fault(1,1);
+V=fault(1,2);
+if Q(fault(1,1),2)==9999
+    Q(K,2)=9999;
+end
+
+
+% if isempty(find(outputs(:,1)==fault(1,1),1))==0
+%     h1=find(outputs(:,1)==fault(1,1),1);
+%     if V==0
+%         outputs(h1,2)=80;
+%     else
+%         outputs(h1,2)=81;
+%     end
+%     
+% end
+
+if(isempty(find(outputs(:,2)==80,1))==0)||isempty(find(outputs(:,2)==81,1))==0
+    disp('SUCCESS');%success if value has reached output
+    inputs111(1,:)=inputs(:,2);
+    disp([num2str(inputs111(1,:))]);
+    status = 'SUCCESS';
+    return;
+end
+if Q(fault(1,1),2)~=9999
+    if isempty(Dfront)==1
+        status='FAILURE';
+        disp('FAILURE');
+        return;
+    end
+end
+
+Q3=Q;
+%% objective
+% % Dfront=14;
+% % Q(16,2)=80;
+[K,V,Q,T,Dfront,OP,flag]=objective(K,V,Q,T,Dfront,OP);
+
+%% backtrace
+[J,V,Q,T,J1,OP]=backtrace(K,V,Q,T,J1,J,OP);
+% J=K;
+% Q(J,2)=V;%set [j,v] value in Q
+%% imply
+[Q,T,Dfront,outputs,fault,inputs,status,flag]=imply(J,V,Q,T,Dfront,outputs,fault,inputs,flag);
+[status,inputs,outputs,Q]=podem1(Q,T,Dfront,outputs,inputs,J,J1,K,V,fault,OP,flag);
+if strcmp(status,'SUCCESS')
+%     disp('SUCCESS');
+    return;
+end
+
+Q=Q3;
+[Q,T,Dfront,outputs,fault,inputs,status,flag]=imply(J,not(V),Q,T,Dfront,outputs,fault,inputs,flag);
+[status,inputs,outputs,Q]=podem1(Q,T,Dfront,outputs,inputs,J,J1,K,V,fault,OP,flag);
+if strcmp(status,'SUCCESS')
+%     disp('SUCCESS');
+    return;
+end
+
+V=9999;
+Q=Q3;
+[Q,T,Dfront,outputs,fault,inputs,status,flag]=imply(J,V,Q,T,Dfront,outputs,fault,inputs,flag);
+% disp('FAIL');
+return;
+end

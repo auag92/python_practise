@@ -1,0 +1,14 @@
+New faults detected for TV: 0  0  0  1  0  1  0
+2 stuck at 1
+5 stuck at 1
+6 stuck at 1
+7 stuck at 1
+9 stuck at 0
+10 stuck at 1
+11 stuck at 1
+14 stuck at 1
+15 stuck at 0
+16 stuck at 0
+17 stuck at 0
+
+Fault coverage = 27.500000%
